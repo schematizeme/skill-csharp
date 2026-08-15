@@ -1,0 +1,12 @@
+slug = "csharp"
+name = "schematize-csharp"
+tag = "Backend · C#/.NET"
+status = "beta"
+order = 9
+current_version = "0.1.0"
+href = "/csharp"
+
+[descriptions]
+pt = "Padrões normativos de engenharia para backends em C# / .NET (ASP.NET Core, EF Core)."
+en = "Normative engineering standards for C# / .NET backends (ASP.NET Core, EF Core)."
+es = "Estándares normativos de ingeniería para backends en C# / .NET (ASP.NET Core, EF Core)."
