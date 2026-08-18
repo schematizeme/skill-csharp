@@ -1,0 +1,86 @@
+# schematize-csharp — workflow de CI de referência (§13, §21, §22, §35).
+# Copie para .github/workflows/ci.yml e ajuste <projeto>/comandos da sua stack.
+# Alvo: .NET LTS atual (8/9). Restore travado por packages.lock.json (§ cadeia).
+name: ci
+on:
+  pull_request:
+  push: { branches: [main] }
+
+env:
+  DOTNET_VERSION: "9.0.x"        # LTS/atual — fixe a linha em global.json
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+jobs:
+  standards-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Gate de padrões (DoD/§37) no diff
+        run: bash .claude/skills/schematize-csharp/scripts/check-diff.sh "origin/${{ github.base_ref || 'main' }}"
+      - name: Índice de microfunções atualizado (§39)
+        run: |
+          node .claude/skills/schematize-csharp/scripts/build-index.mjs ./src > /tmp/idx.md || true
+          # compara com o commitado; descomente quando o índice estiver versionado:
+          # diff -q /tmp/idx.md <projeto>_archive/index/INDEX_FUNCTIONS.md
+      - name: Scan de segredo no archive (§16.1/§32)
+        run: bash .claude/skills/schematize-csharp/scripts/archive-secret-scan.sh .
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "${{ env.DOTNET_VERSION }}" }
+      - name: Restore (locked — falha se packages.lock.json divergir; §cadeia)
+        run: dotnet restore --locked-mode
+      - name: Format check (analyzers/estilo — §6)
+        run: dotnet format --verify-no-changes --severity warn
+      - name: Build (warnings como erro — nullable/analyzers travam; §4/§6)
+        run: dotnet build -c Release --no-restore -warnaserror
+      - name: Test + cobertura (xUnit + coverlet — §22)
+        run: >
+          dotnet test -c Release --no-build
+          --collect:"XPlat Code Coverage"
+          --logger "trx;LogFileName=test.trx"
+      - name: Smoke self-check (anti verde-mentiroso — §22.3)
+        run: bash .claude/skills/schematize-csharp/scripts/smoke-selfcheck.sh --self-check
+      - name: Test kit do ops (smoke/security/authz/hardening — §22.6)
+        run: |
+          # <projeto> test smoke && <projeto> test security && <projeto> test authz && <projeto> test hardening
+          echo "ligue ao CLI <projeto>_ops aqui"
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "${{ env.DOTNET_VERSION }}" }
+      - name: Restore
+        run: dotnet restore --locked-mode
+      - name: Deps vulneráveis (SCA — fail on high/critical; §13)
+        run: |
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee /tmp/vuln.txt
+          grep -E 'High|Critical' /tmp/vuln.txt && { echo "::error::dependência vulnerável"; exit 1; } || true
+      - name: SBOM (CycloneDX — §cadeia)
+        run: |
+          dotnet tool install --global CycloneDX || true
+          dotnet CycloneDX . -o ./sbom || true
+      - name: Trivy fs
+        uses: aquasecurity/trivy-action@master
+        with: { scan-type: fs, severity: HIGH,CRITICAL, exit-code: '1' }
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions: { security-events: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: csharp }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "${{ env.DOTNET_VERSION }}" }
+      - run: dotnet build -c Release
+      - uses: github/codeql-action/analyze@v3
