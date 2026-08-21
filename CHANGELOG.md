@@ -1,5 +1,22 @@
 # Changelog — schematize-csharp
 
+Todas as mudanças relevantes deste pacote, no formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
+com versionamento [SemVer](https://semver.org/lang/pt-BR/).
+
+## [0.3.0] — 2026-08-21
+Saneamento do catálogo conforme a vistoria de 2026-08-21.
+
+### Corrigido
+- **`JsonWebTokenHandler`** no lugar do `JwtSecurityTokenHandler` legado, com o motivo que evita a "correção" errada: o handler antigo **mapeia os claims para os nomes longos do WS-Federation**, o que faz `User.FindFirst("sub")` voltar `null`.
+- **`Rfc2898DeriveBytes.Pbkdf2(...)`** (API estática) onde PBKDF2 aparecer: o **construtor** é obsoleto (**`SYSLIB0041`**) e, com o `TreatWarningsAsErrors` que a própria skill exige, o código que seguia o conselho antigo **nem compilava**. E a posição virou **argon2id-only** para senha nova, com PBKDF2 como legado a migrar.
+- **`JoinSet` saiu** — é tipo do **Tokio (Rust)**, vazamento da skill irmã. O item passou a dizer o que queria dizer, com os tipos do .NET (`Task.WhenAll`/`WhenEach`/`Parallel.ForEachAsync`) e o nome do erro real: *task disparada e esquecida é o caminho mais curto para exceção que ninguém vê*.
+- **CA2016 é *encaminhar*, CA1068 é posição**, e **nenhum analyzer built-in obriga a DECLARAR** o `CancellationToken` — isso é regra de revisão. *Regra que se descobre inexistente é regra que se deixa de seguir.*
+- **`Task.Run` para CPU-bound é anti-padrão em ASP.NET Core** (mesmo thread pool, só troca de contexto; é jeito conhecido de virar thread pool starvation). O que resolve é **tirar o trabalho do caminho da request**.
+
+### Adicionado
+- **Rate limiting** (`seguranca.md` §14.1) com `AddRateLimiter`: política de auth particionada por **rota + identificador + IP**, `429` com `Retry-After`, `ForwardedHeaders` com proxies confiáveis (senão o `X-Forwarded-For` é escolhido pelo atacante — e vira jeito de esgotar a memória do limitador), e a lembrança de que **o limite do processo não é o limite do sistema**.
+- **`Microsoft.Extensions.Http.Resilience`** (`AddStandardResilienceHandler`) como o caminho oficial do Polly v8.
+
 ## [0.2.0] — 2026-08-20
 Piso "efeito externo NUNCA sai de não-produção" no recorte C#/.NET.
 ### Adicionado
@@ -16,9 +33,6 @@ Piso "efeito externo NUNCA sai de não-produção" no recorte C#/.NET.
 Correção da contradição do muro pré-login de IAM (alinha ao `iam.md` da schematize-engineering).
 ### Mudado
 - **/cs-iam**: removido o "2º fator forte obrigatório antes do acesso pleno" e o "força 2º fator no 1º login" — o muro pré-login / deadlock de bootstrap VETADO pela norma. Agora senha+Email OTP = 2FA baseline; fator forte é nudge + step-up just-in-time.
-
-
-Formato: [Keep a Changelog]; versionamento: SemVer.
 
 ## [0.1.1] — 2026-08-18
 Q.A. repointado para a skill dedicada **schematize-qa**.
