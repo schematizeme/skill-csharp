@@ -20,7 +20,7 @@
 - Comunicação entre serviços via HTTP, gRPC, eventos ou mensageria — nunca via banco compartilhado.
 - Cada serviço é dono do seu schema.
 - **Nome do repositório:** `<projeto>_<contexto>[_<lang>]` em snake_case minúsculo. `<projeto>` = slug do produto/organização; `<contexto>` = a aplicação/bounded context daquele repo (`api`, `worker`, `front`, `backoffice`, `gateway`…); `_<lang>` é sufixo **opcional** pra desambiguar linguagem (`_cs` C#/.NET, `_go` Go, `_rs` Rust, `_ts` TypeScript). Como um repo = um contexto, o nome espelha isso. Ex.: `loja_api_cs`, `loja_front`, `loja_worker_cs`.
-- **Independência de runtime (cada serviço é entidade à parte):** todo serviço **sobe e opera sozinho**. A indisponibilidade de qualquer outro serviço **nunca** impede o boot nem derruba este — depender de outro serviço para *iniciar/funcionar* é VETADO (nada de "o `ledger` não sobe se o `core` estiver fora"). Dependente ausente vira **degradação graciosa** (fallback, resposta parcial, enfileira e segue), nunca crash em cascata. Como não perder o dado quando a chamada falha: `references/dados-eventos.md` (§18).
+- **Independência de runtime (cada serviço é entidade à parte):** todo serviço **sobe e opera sozinho**. A indisponibilidade de qualquer outro serviço **nunca** impede o boot nem derruba este — depender de outro serviço para *iniciar/funcionar* é VETADO (nada de "o `ledger` não sobe se o `core` estiver fora"). Dependente ausente vira **degradação graciosa** (fallback, resposta parcial, enfileira e segue), nunca crash em cascata. Como não perder o dado quando a chamada falha: `schematize-engineering` -> `references/dados-eventos.md` (§18).
 - **`<projeto>_ops` (control plane de desenvolvimento):** todo sistema multi-repo tem um repo **`<projeto>_ops`** — a ferramenta de operação do workspace, rodada por dev/agente e **fora do runtime do produto**. Faz bootstrap/instalação, update, manutenção, troubleshooting e roda os testes unitários/debug **através de todos os repos** (clona, sobe/para, migra, semeia e testa cada serviço). Não é microserviço nem é deployado com o produto; é essencial pra tocar um sistema de múltiplos repositórios. Como toda ferramenta, sobe com **observabilidade integrada** (Grafana/LGTM+, ver `references/observabilidade.md` §16).
 - **Contenção no workspace (nunca sair da pasta do projeto):** o **diretório de projeto atual é o workspace**; toda aplicação/repo do sistema nasce e mora **dentro dele**. Vai criar uma aplicação nova? Crie uma **pasta pra ela dentro da pasta atual** (`./<projeto>_<contexto>/`) e trabalhe lá — **nunca** largue arquivos soltos no root pra depois **subir de diretório** (`cd ..`, `../`) e criar os outros repos fora. Num sistema multi-repo os repos são **irmãos dentro do mesmo workspace** (clonados ali pelo `<projeto>_ops`), não espalhados pela máquina. **VETADO** criar/ler/escrever fora do workspace: diretório-pai, `~`, `~/Documents`, `~/Downloads`, `/tmp` do usuário, Área de Trabalho. O agente **não sai da pasta do projeto** — nem pra vasculhar, nem pra criar — a menos que o usuário peça explicitamente.
 
@@ -62,7 +62,7 @@ A casa **não tem "a linguagem única"** — tem um **rol sancionado** e um **gu
 **Frontend — Node é 100% permitido (e só frontend).** **Next.js** é a stack principal; **Astro e outros frameworks consolidados** são permitidos. O server-side do próprio front (route handlers, server actions, BFF) faz parte do frontend e é governado pelo §13.4 e §38 (segredo só server-side). Blazor/MAUI e qualquer UI ficam com o **`schematize-web`**; **aqui é API/backend/serviços** em C#. Isso vale só para frontend — **não** reabre Node como serviço backend.
 
 **MUST**
-- Versão exata em uso fica no Anexo A / `references/stack-versoes.md` (alvo: **.NET LTS atual, 8/9**).
+- Versão exata em uso fica no Anexo A / `references/stack-versoes.md` (alvo: **.NET LTS atual — .NET 10**; verificado em 2026-08-21).
 - Não misturar linguagens dentro do **mesmo bounded context** sem ADR.
 - **Todo serviço backend novo nasce no rol sancionado, com ADR de fit.** C# entra pelo encaixe acima — não por gosto, e não como "porque já sei C#" sem o fit.
 - **Nova linguagem fora do rol** exige **ADR de exceção** aprovado.
@@ -127,10 +127,10 @@ Projetos legados onde código já existe sem separação de camadas **podem** ad
 - Toda nova feature/refactor em código tocado segue o layout completo (`domain/`, `application/`, `infrastructure/`, `interface/`) — não introduzir mais código "flat".
 - Ao mover/quebrar arquivo legado, organize já em folders DDD mesmo que internamente alguma classe ainda misture responsabilidades (ex.: service em `application/` ainda chamando SQL direto). Estrutura primeiro, inversão depois.
 - Cada PR que toca arquivo híbrido **deve** mover ao menos um pedaço pra direção certa (ex.: extrair entidade pra `domain/`, mover query pra `infrastructure/repositories/`).
-- ADR registrando o débito e o plano de remoção: `<project>/docs/adr/<n>-ddd-migration-<contexto>.md`.
+- ADR registrando o débito e o plano de remoção: `<projeto>/<projeto>_archive/decisoes/<n>-ddd-migration-<contexto>.md`.
 
 **SHOULD**
-- Manter teste de cobertura por camada (§22) durante a transição — domain começa com 0%, sobe a cada PR.
+- Manter teste de cobertura por camada (ver a `schematize-qa`) durante a transição — domain começa com 0%, sobe a cada PR.
 - Em C#, a **própria árvore de `ProjectReference`** é o guard: o `.csproj` de `Domain` não referencia framework/ORM nem os outros projetos; violar isso não compila. Onde o legado ainda é um projeto único, use um **guard test** (ex.: teste de arquitetura com `NetArchTest`/análise de `using`) que **rejeita dependências proibidas** (mesmo com whitelist de exceções legadas):
   - `Domain` não usa `Microsoft.AspNetCore.*`, `Microsoft.EntityFrameworkCore`, `System.Data.*`, nem os namespaces de `Infrastructure`/`Application`/`Api`.
   - `Application` não depende de `Api` (interface).

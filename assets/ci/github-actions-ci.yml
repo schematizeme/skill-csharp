@@ -1,13 +1,15 @@
-# schematize-csharp — workflow de CI de referência (§13, §21, §22, §35).
+# schematize-csharp — workflow de CI de referência (§13, §21, a `schematize-qa`, §35).
 # Copie para .github/workflows/ci.yml e ajuste <projeto>/comandos da sua stack.
-# Alvo: .NET LTS atual (8/9). Restore travado por packages.lock.json (§ cadeia).
+# Alvo: o .NET LTS corrente — o numero vive no anexo volatil da skill
+# (references/stack-versoes.md, com data de verificacao), nunca duplicado aqui.
+# Restore travado por packages.lock.json (§ cadeia).
 name: ci
 on:
   pull_request:
   push: { branches: [main] }
 
 env:
-  DOTNET_VERSION: "9.0.x"        # LTS/atual — fixe a linha em global.json
+  DOTNET_VERSION: "10.0.x"       # LTS corrente (verificado 2026-08-21) — fixe a linha em global.json
   DOTNET_NOLOGO: "true"
   DOTNET_CLI_TELEMETRY_OPTOUT: "true"
 
@@ -20,10 +22,12 @@ jobs:
       - name: Gate de padrões (DoD/§37) no diff
         run: bash .claude/skills/schematize-csharp/scripts/check-diff.sh "origin/${{ github.base_ref || 'main' }}"
       - name: Índice de microfunções atualizado (§39)
-        run: |
-          node .claude/skills/schematize-csharp/scripts/build-index.mjs ./src > /tmp/idx.md || true
-          # compara com o commitado; descomente quando o índice estiver versionado:
-          # diff -q /tmp/idx.md <projeto>_archive/index/INDEX_FUNCTIONS.md
+        env:
+          # Sem estes dois o gate NAO roda — e nao rodar REPROVA. Gate desarmado em silencio
+          # ("|| true" + diff comentado) foi o achado A5 da vistoria de 2026-08-21.
+          INDEX_SRC: ${{ vars.INDEX_SRC || './src' }}
+          INDEX_FILE: ${{ vars.INDEX_FILE }}
+        run: bash .claude/skills/schematize-csharp/scripts/check-index.sh
       - name: Scan de segredo no archive (§16.1/§32)
         run: bash .claude/skills/schematize-csharp/scripts/archive-secret-scan.sh .
 
@@ -39,14 +43,14 @@ jobs:
         run: dotnet format --verify-no-changes --severity warn
       - name: Build (warnings como erro — nullable/analyzers travam; §4/§6)
         run: dotnet build -c Release --no-restore -warnaserror
-      - name: Test + cobertura (xUnit + coverlet — §22)
+      - name: Test + cobertura (xUnit + coverlet — a `schematize-qa`)
         run: >
           dotnet test -c Release --no-build
           --collect:"XPlat Code Coverage"
           --logger "trx;LogFileName=test.trx"
-      - name: Smoke self-check (anti verde-mentiroso — §22.3)
+      - name: Smoke self-check (anti verde-mentiroso — a `schematize-qa` (smoke e matriz simulated, `references/categorias.md` secoes 5 e 10))
         run: bash .claude/skills/schematize-csharp/scripts/smoke-selfcheck.sh --self-check
-      - name: Test kit do ops (smoke/security/authz/hardening — §22.6)
+      - name: Test kit do ops (smoke/security/authz/hardening — a `schematize-qa` (gates de CI, `references/execucao.md` secao 6))
         run: |
           # <projeto> test smoke && <projeto> test security && <projeto> test authz && <projeto> test hardening
           echo "ligue ao CLI <projeto>_ops aqui"
@@ -61,12 +65,19 @@ jobs:
         run: dotnet restore --locked-mode
       - name: Deps vulneráveis (SCA — fail on high/critical; §13)
         run: |
+          set -uo pipefail
           dotnet list package --vulnerable --include-transitive 2>&1 | tee /tmp/vuln.txt
-          grep -E 'High|Critical' /tmp/vuln.txt && { echo "::error::dependência vulnerável"; exit 1; } || true
+          rc=${PIPESTATUS[0]}
+          [ "$rc" -eq 0 ] || { echo "::error::dotnet list package falhou (rc=$rc) — o gate NAO rodou"; exit 1; }
+          if grep -qE 'High|Critical' /tmp/vuln.txt; then
+            echo "::error::dependência vulnerável (High/Critical)"; exit 1
+          fi
       - name: SBOM (CycloneDX — §cadeia)
         run: |
-          dotnet tool install --global CycloneDX || true
-          dotnet CycloneDX . -o ./sbom || true
+          set -euo pipefail
+          # `install` e idempotente: ja instalado devolve erro, e isso NAO e falha do gate.
+          dotnet tool install --global CycloneDX || dotnet tool update --global CycloneDX
+          dotnet CycloneDX . -o ./sbom
       - name: Trivy fs
         uses: aquasecurity/trivy-action@master
         with: { scan-type: fs, severity: HIGH,CRITICAL, exit-code: '1' }

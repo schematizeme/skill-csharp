@@ -13,7 +13,7 @@ Carregue **à força** e passe a aplicar **integralmente** os Padrões de Engenh
    - `iam.md` — **IAM da casa (recorte C#/.NET)**: auth como microserviço **C#/.NET (ASP.NET Core)** separado (`auth.<domain>`), ID≠email, ≥2 fatores (passkey Fido2 .NET/Resend/Twilio), ReBAC multi-tenant deny-default (PEP=middleware/policy ASP.NET Core), sessão 7d/90d, logout irreversível, migração de legado prioridade 0.
    - `dados-eventos.md` — eventos/mensageria, banco (EF Core / migrations), cache, APIs, resiliência (Polly), jobs.
    - `cadeia-suprimentos.md` — lockfile (`packages.lock.json`), SBOM, scan que trava, imagem mínima/pinada/assinada, SLSA.
-   - `testes.md` + `testes-execucao.md` — test kit (xUnit), "verde de verdade", pentest, Q.A. plan-first.
+   - `testes.md` — test kit (xUnit), "verde de verdade", pentest, Q.A. plan-first.
    - `observabilidade.md` — healthchecks, performance, FinOps, **OpenTelemetry .NET** (traces/metrics/logs).
    - `operacao.md` + `entrega.md` — config, deploy/K8s, git/PR, runbooks, ADR, **archive**, DoD, índice.
    - `ops.md` — **control plane `<projeto>_ops`**: fluxo dev→local→github→hml→prd (nada direto no servidor), ops como interface única (100%, autônomo), instalação paralela=`nproc`, independência=invariante (prioridade máxima).

@@ -2,14 +2,44 @@
 name: schematize-csharp
 metadata:
   version: 0.2.0
-description: Padrões normativos de engenharia da casa no recorte C# / .NET (ASP.NET Core, EF Core, .NET LTS 8/9) — arquitetura/DDD, segurança, IAM, testes/pentest, dados, observabilidade, deploy, archive. Use SEMPRE que for projetar, gerar, revisar ou refatorar backend, API, serviço, worker, schema, migration, infra, CI/CD, teste ou deploy em C#/.NET — mesmo que o usuário não cite "padrão". Aplique também ao decidir arquitetura, escolher stack (C# entra por fit + ADR no rol sancionado Go/Rust/Elixir/C#/Zig/Ruby), modelar eventos/banco, desenhar auth/identidade, escrever testes/pentest, configurar observabilidade, ou produzir ADR/runbook/archive. Contém pisos inegociáveis (segredo nunca no cliente, sem SQL por concatenação/interpolação — EF/Dapper parametrizado, nullable reference types habilitado, auth server-side, JWT validado por inteiro, IAM como app separada, efeito externo (e-mail/SMS/push) nunca sai de não-produção — sink por default e domínio de teste em rota nula, archive obrigatório) que vetam atalhos inseguros. Frontend (incl. Blazor/UI) delega ao schematize-web; segurança ofensiva na schematize-pentest.
+description: Padrões normativos de engenharia da casa no recorte C#/.NET (ASP.NET Core, EF Core, .NET LTS) — arquitetura/DDD, segurança, IAM, testes/pentest, dados, observabilidade, deploy, archive. Use SEMPRE que for projetar, gerar, revisar ou refatorar backend, API, serviço, worker, schema, migration, infra, CI/CD, teste ou deploy em C#/.NET — mesmo sem citar "padrão" —, e ao escolher stack (C# entra por fit + ADR no rol Go/Rust/Elixir/C#/Zig/Ruby), modelar eventos/banco, desenhar auth, configurar observabilidade ou produzir ADR/runbook/archive. Pisos: segredo nunca no cliente; sem SQL concatenado (EF/Dapper parametrizado); nullable reference types ligado; auth server-side com JWT validado por inteiro; IAM como app separada; efeito externo (e-mail/SMS/push) NUNCA sai de não-produção — sink por default, guard deny-by-default, cap por execução, domínio de teste em rota nula; archive obrigatório. Frontend (incl. Blazor) delega à schematize-web; segurança ofensiva à schematize-pentest.
 ---
 
 # Padrões de Engenharia da Casa — C# / .NET
 
-Conjunto normativo que rege como software em **C# (.NET)** é projetado, construído, testado e operado aqui. Esta skill é o **recorte C#** dos Padrões de Engenharia da Casa: mantém **todos os pisos agnósticos** (segurança, IAM, testes de verdade, ops/DoD/archive) e os concretiza no ecossistema .NET — **ASP.NET Core**, **EF Core**, **.NET LTS atual (8/9)**. Toda entrega — humana ou assistida por IA — segue os mesmos padrões de clareza, segurança e observabilidade, sem reinventar nem cortar caminho.
+Conjunto normativo que rege como software em **C# (.NET)** é projetado, construído, testado e operado aqui. Esta skill é o **recorte C#** dos Padrões de Engenharia da Casa: mantém **todos os pisos agnósticos** (segurança, IAM, testes de verdade, ops/DoD/archive) e os concretiza no ecossistema .NET — **ASP.NET Core**, **EF Core** e o **.NET LTS corrente** — a versão exata vive só no anexo volátil (`references/stack-versoes.md`, com data de verificação), nunca aqui. Toda entrega — humana ou assistida por IA — segue os mesmos padrões de clareza, segurança e observabilidade, sem reinventar nem cortar caminho.
 
 **Versão:** skill `schematize-csharp` v0.2.0. Changelog em `CHANGELOG.md`.
+
+## Precedência e herança (leia antes de divergir)
+
+Esta skill é o **recorte C#/.NET** da base. Duas regras governam a relação, e elas resolvem sozinhas
+quase toda dúvida de "onde está escrito o quê":
+
+1. **Onde esta skill divergir da base, a BASE MANDA.** `schematize-engineering` é a normativa; aqui
+   mora a **especialização** — o mecanismo, a lib, a sintaxe, o gate da linguagem. Divergência de
+   *piso* entre este arquivo e a base é **defeito desta skill**, não uma variante local aceitável.
+   Achou uma? É item de correção, não licença. *(Foi assim que o `argon2id-only` da casa virou
+   "argon2id ou PBKDF2" em uma skill só, e o rol de 6 linguagens virou "só Go e Rust" em três.)*
+2. **O que não está repetido aqui é HERDADO, não dispensado.** A ausência de um piso neste repo
+   nunca significa que ele não vale — significa que ele não muda de forma nesta linguagem. Em
+   especial, valem integralmente, sem cópia local:
+   - **§28 Archive** — `<projeto>/<projeto>_archive/` é **repositório git próprio, PRIVADO e
+     obrigatório**, criticidade 0 (`schematize-archive`; ADR-0005 para a planta canônica).
+   - **§39 Índice/MAPA** — enumeração exaustiva (uma entrada por unidade chamável, `M == N`) e o
+     **grafo com arestas em ASCII (`A -> B`), NUNCA a seta unicode** — o parser do app lê ASCII.
+   - **§35 Definition of Done** e a lista de anti-padrões **§37** (citada por **título**, nunca por
+     número: a numeração dos itens diverge entre skills).
+   - **IAM** (`schematize-engineering` → `references/iam.md`): identidade ≠ email, ≥2 fatores, ReBAC multi-tenant,
+     **alcançabilidade do 2º fator** (o fator de recuperação tem de ser alcançável quando o
+     principal cai — senão o 2FA vira bug de bootstrap que tranca o dono para fora), os parâmetros
+     mínimos de argon2id, sessão longa e logout irreversível.
+   - **Rol sancionado** — Go, Rust, Elixir, C#, Zig, Ruby, por **fit + ADR**
+     (`schematize-engineering` → `references/linguagens.md`). Esta skill é **uma** delas, não a
+     régua das outras.
+   - **Efeito externo** nunca sai de não-produção (`schematize-engineering` →
+     `references/efeitos-externos.md`; gate em `scripts/check-external-effects.sh`, distribuído
+     aqui — ADR-0008).
 
 ## Comandos (Claude Code)
 
@@ -42,15 +72,14 @@ Mapa de references — leia o que casa com a tarefa:
 |---|---|
 | **Limites de código (arquivo ≤750: ~500 úteis + ~250 comentário; flag >300 úteis), uma unidade/arquivo, `///` XML doc, MAPA** | `references/padroes-codigo.md` |
 | Arquitetura, camadas (projeto por camada/DDD), repositórios, anti-monólito, **rol de linguagens + fit de C#**, CQRS | `references/arquitetura.md` |
-| **Stack/versões: .NET LTS 8/9, `dotnet` CLI, ASP.NET Core, EF Core, nullable/analyzers, Central Package Management + lockfile, Polly** | `references/stack-versoes.md` |
+| **Stack/versões: .NET LTS corrente, `dotnet` CLI, ASP.NET Core, EF Core, nullable/analyzers, Central Package Management + lockfile, Polly** | `references/stack-versoes.md` |
 | **Async/concorrência: async/await de ponta a ponta, `CancellationToken`, `Task`/`ValueTask`, `Channel<T>`, backpressure, sem sync-over-async/`async void`, shutdown gracioso** | `references/async-concorrencia.md` |
 | Eventos/mensageria, banco, cache, APIs, resiliência, jobs, migrations reversíveis (`dotnet ef`) | `references/dados-eventos.md` |
 | Segurança, auth, JWT (`JwtBearer` completo), multi-tenancy, LGPD, EF parametrizado, secrets, Data Protection, **frontend/segredos** | `references/seguranca.md` |
 | **Efeito externo fora de prd (e-mail/SMS/push): sink por default, guard como decorator no DI, `IOptions` com `ValidateOnStart`, cap com `Interlocked`, domínio de teste em rota nula** | `references/iam.md` (§3.1) + `schematize-engineering/references/efeitos-externos.md` |
 | **IAM (identidade+autorização): auth como microserviço C#/.NET separado (`auth.<domain>`), ID≠email, ≥2 fatores/passkey/Resend/Twilio, ReBAC multi-tenant, sessão longa/logout irreversível, migração de legado** | `references/iam.md` |
 | **Cadeia de suprimentos: `packages.lock.json`/CPM, SBOM, scan que trava, imagem mínima/pinada/assinada, SLSA, segredo no build** | `references/cadeia-suprimentos.md` |
-| Testes — test kit, saída machine-readable, categorias de teste (§22.1–22.3), xUnit/coverlet/FsCheck | `references/testes.md` |
-| Testes — padrão de script, seeds, CI, pentest, Q.A. plan-first, Makefile (§22.4–23) | `references/testes-execucao.md` |
+| Testes — o recorte C#/.NET (runner, sintaxe, armadilhas do dialeto). **A disciplina é da `schematize-qa`.** | `references/testes.md` |
 | Observabilidade (OpenTelemetry .NET + `ILogger`), healthchecks, performance, FinOps | `references/observabilidade.md` |
 | Config, deploy/K8s, git/PR, ownership, runbooks/incidentes, ADR, **archive** (§20–28) | `references/operacao.md` |
 | **Ops (control plane): fluxo dev→local→github→hml→prd (nada direto no servidor), ops como interface única (100%, autônomo), instalação paralela=`nproc`, independência=invariante** | `references/ops.md` |
@@ -83,11 +112,11 @@ Estes nunca são violados, nem "pra funcionar", nem "pra ir mais rápido". A lis
 
 ## Testes — o que conta como "verde de verdade"
 
-Detalhe completo em `references/testes.md` (§22.1–22.3) e `references/testes-execucao.md` (§22.4–23). Ferramental da casa: **xUnit** (primário) / NUnit, **FluentAssertions**, **coverlet** (cobertura), **FsCheck** (property-based), **Stryker.NET** (mutation), **Testcontainers** (integração), **Moq/NSubstitute** nas bordas. O essencial:
+Detalhe em `references/testes.md` (o recorte C#/.NET) — a **disciplina** de teste é da `schematize-qa`, e a segurança ofensiva da `schematize-pentest`.
 
 - **Smoke não pode ser teatro:** assertar shape do body (não só status 200), assertion negativa (sem stack trace/placeholder), e um **self-check que força uma falha conhecida** pra provar que o runner consegue reportar FAIL. Smoke que nunca falha está cego.
 - **Unit agressivo:** caminho de erro obrigatório, casos hostis (tipo errado, unicode, null byte, boundary), property-based (FsCheck) e mutation testing (Stryker.NET) no domínio crítico. Cobertura de linha é piso, não meta.
-- **Pentest prova rejeição, rota por rota, campo por campo:** nunca 500 por input hostil, nunca coerção silenciosa de tipo, nunca eco sem escape, nunca vazamento cross-tenant. Princípios em `references/testes-execucao.md` (§22.8).
+- **Pentest prova rejeição, rota por rota, campo por campo:** nunca 500 por input hostil, nunca coerção silenciosa de tipo, nunca eco sem escape, nunca vazamento cross-tenant. Princípios em a `schematize-pentest`).
 - **`simulated` (teste emulado):** cruza rotas × personas × injections e prova que **100% das rotas** do inventário estão acessíveis pra quem deve e bloqueadas pra quem não deve. Rota fantasma/morta quebra o run.
 - **Q.A. mora na skill dedicada `schematize-qa`** (`/qa-plan` → `/qa-run`): planeja tudo, gera o MD de passo a passo, **pede aprovação antes de rodar** e trava nos gates. `/cs-qa` é o wrapper no recorte C#/.NET (`dotnet test`/xUnit). Nada de Q.A. roda às cegas.
 

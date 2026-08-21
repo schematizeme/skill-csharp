@@ -1,5 +1,10 @@
 # Stack e Versões — C# / .NET
 
+> **Verificado em: 2026-08-21** — o LTS corrente é o **.NET 10** (último patch **10.0.11**,
+> 11/08/2026), com suporte até nov/2028. **.NET 8 e .NET 9 terminam em 10/11/2026** — menos de
+> três meses a partir desta verificação. *(Este anexo dizia ".NET LTS atual — 8 ou 9"; além de
+> vencido, era factualmente errado: o **9 é STS**, não LTS.)*
+>
 > Parte da skill **schematize-csharp**. Define o ferramental, as versões-alvo e o
 > piso de toolchain do recorte C# (.NET) do rol sancionado. A escolha da linguagem
 > (fit + ADR) está em `references/arquitetura.md` (§3) e no canônico agnóstico
@@ -8,7 +13,7 @@
 
 ## 1. Versões-alvo (piso)
 
-- **Runtime/SDK:** **.NET LTS atual — .NET 8 ou 9**. Sempre em versão **suportada
+- **Runtime/SDK:** **.NET LTS atual — .NET 10** (`net10.0`). Sempre em versão **suportada
   pela Microsoft** (LTS preferida em produção; STS só com plano de upgrade). **EOL
   é dívida ativa:** rodar em versão fora de suporte é violação de cadeia de
   suprimentos (`references/cadeia-suprimentos.md`) — planeje o upgrade **antes** do
