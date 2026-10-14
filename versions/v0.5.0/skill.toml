@@ -1,0 +1,13 @@
+slug = "csharp"
+name = "schematize-csharp"
+tag = "Backend · C#/.NET"
+status = "beta"
+order = 9
+current_version = "0.5.0"
+requires = ["engineering"]   # o piso vem da base; esta skill so especializa (SKILL.md, "Precedencia e heranca")
+href = "/csharp"
+
+[descriptions]
+pt = "Padrões normativos de engenharia para backends em C# / .NET (ASP.NET Core, EF Core)."
+en = "Normative engineering standards for C# / .NET backends (ASP.NET Core, EF Core)."
+es = "Estándares normativos de ingeniería para backends en C# / .NET (ASP.NET Core, EF Core)."

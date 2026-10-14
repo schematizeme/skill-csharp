@@ -1,7 +1,7 @@
 ---
 name: schematize-csharp
 metadata:
-  version: 0.4.2
+  version: 0.5.0
 description: >-
   Padrões de engenharia para C#/.NET: ASP.NET Core, EF Core, .NET LTS. Use ao projetar, revisar ou refatorar backend,
   API, worker, migration ou CI/CD em projeto com *.csproj/*.sln/*.cs, ou ao escolher C# no rol (fit + ADR). Blazor é
@@ -12,7 +12,7 @@ description: >-
 
 Conjunto normativo que rege como software em **C# (.NET)** é projetado, construído, testado e operado aqui. Esta skill é o **recorte C#** dos Padrões de Engenharia da Casa: mantém **todos os pisos agnósticos** (segurança, IAM, testes de verdade, ops/DoD/archive) e os concretiza no ecossistema .NET — **ASP.NET Core**, **EF Core** e o **.NET LTS corrente** — a versão exata vive só no anexo volátil (`references/stack-versoes.md`, com data de verificação), nunca aqui. Toda entrega — humana ou assistida por IA — segue os mesmos padrões de clareza, segurança e observabilidade, sem reinventar nem cortar caminho.
 
-**Versão:** skill `schematize-csharp` v0.4.2. Changelog em `CHANGELOG.md`.
+**Versão:** skill `schematize-csharp` v0.5.0. Changelog em `CHANGELOG.md`.
 
 ## Precedência e herança (leia antes de divergir)
 
