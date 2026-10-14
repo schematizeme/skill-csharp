@@ -1,0 +1,33 @@
+<!-- schematize-csharp — Directory.Build.props (§4, §6, §cadeia).
+     Copie para a raiz da solution: vale para TODOS os projetos (.csproj) abaixo.
+     Fixa os pisos de linguagem sem repetir em cada projeto. -->
+<Project>
+  <PropertyGroup>
+    <!-- Alvo LTS/atual — ajuste em global.json também. -->
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+
+    <!-- PISO §4: nullable reference types habilitado em todo lugar. -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- PISO §6/§37: warning é erro. Nullable/analyzer não passa "amarelo". -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors></WarningsNotAsErrors>
+
+    <!-- Analyzers Roslyn no nível recomendado + fluxo de análise. -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Doc XML `///` alimenta o índice de microfunções (§39). -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- PISO §cadeia: lockfile determinístico; CI usa --locked-mode. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+    <!-- Higiene de deps: Central Package Management (Directory.Packages.props). -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

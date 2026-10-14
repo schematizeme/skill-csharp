@@ -3,7 +3,7 @@ name = "schematize-csharp"
 tag = "Backend · C#/.NET"
 status = "beta"
 order = 9
-current_version = "0.5.0"
+current_version = "0.5.1"
 requires = ["engineering"]   # o piso vem da base; esta skill so especializa (SKILL.md, "Precedencia e heranca")
 href = "/csharp"
 
