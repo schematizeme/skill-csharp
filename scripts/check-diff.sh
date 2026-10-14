@@ -14,6 +14,12 @@ BASE="${1:-origin/main}"
 FAIL=0
 RED=$'\033[0;31m'; YLW=$'\033[0;33m'; GRN=$'\033[0;32m'; RST=$'\033[0m'
 
+# Base inexistente NAO pode virar verde: `git diff` falha, FILES fica vazio e o gate diria OK sem ter olhado nada.
+if ! git rev-parse --verify -q "$BASE^{commit}" >/dev/null 2>&1; then
+  echo "${RED}✗ BLOQUEIA${RST} base '$BASE' não resolve para um commit (ou não é repo git) — o gate não olhou nada"
+  exit 1
+fi
+
 # Arquivos de código alterados (exclui exceções da §6).
 mapfile -t FILES < <(git diff --name-only "$BASE"...HEAD 2>/dev/null \
   | grep -E '\.(cs|go|rs|ts|tsx|js|mjs|jsx)$' \
@@ -74,9 +80,9 @@ has_perl_grep() { echo x | grep -qP x 2>/dev/null; }
 scan 'NEXT_PUBLIC_[A-Z_]*(SECRET|KEY|TOKEN|PASSWORD|PRIVATE)' 'segredo exposto via NEXT_PUBLIC_ (§13.4/§37)'
 scan 'rejectUnauthorized:\s*false|InsecureSkipVerify:\s*true|verify\s*=\s*False' 'verificação TLS desabilitada (§37)'
 scan 'Math\.random\(\).*(token|secret|session|nonce|reset)' 'Math.random em contexto de segredo — use CSPRNG (§14/§37)'
-scan 'new\s+Random\(\).*(token|secret|session|nonce|reset|key)|Guid\.NewGuid\(\).*(token|secret|nonce)' 'System.Random/Guid em contexto de segredo — use RandomNumberGenerator (§14/§37)'
+scan '(token|secret|session|nonce|reset|key)[A-Za-z_]*[^;]*(new\s+Random\(\)|Guid\.NewGuid\(\))|(new\s+Random\(\)|Guid\.NewGuid\(\)).*(token|secret|session|nonce|reset|key)' 'System.Random/Guid em contexto de segredo — use RandomNumberGenerator (§14/§37)'
 scan 'eslint-disable.*security|//\s*nolint:.*(gosec|sec)|#\s*nosec|#\s*pragma\s+warning\s+disable' 'desabilitando regra de segurança/analyzer inline (§37)'
-scan 'Access-Control-Allow-Origin["'\'' :]*\*|WithOrigins\([^)]*\*|AllowAnyOrigin\(\)' 'CORS * — allowlist explícita (§37)'
+scan 'Access-Control-Allow-Origin["'\'' :,]*\*|WithOrigins\([^)]*\*|AllowAnyOrigin\(\)' 'CORS * — allowlist explícita (§37)'
 scan '(query|exec|raw)\(\s*[`"'\''].*\$\{|"\s*\+\s*.*(req|input|param|body)|FromSqlRaw\([^)]*\$"|ExecuteSqlRaw\([^)]*\$"|CommandText\s*=\s*\$"' 'possível SQL por concatenação/interpolação — use parâmetros EF/Dapper (§10/§37)'
 scan 'catch\s*\(\s*\)\s*\{\s*\}|except\s*:\s*pass|catch\s*\{\s*\}|catch\s*\([^)]*\)\s*\{\s*\}' 'erro engolido (§37)'
 scan '@ts-ignore|: any\b|interface\{\}|#nullable\s+disable' 'tipo silenciado (any/@ts-ignore/#nullable disable) (§4/§37)'
@@ -91,7 +97,7 @@ fi
 
 # 4) §3 — backend novo em PHP
 php=$(git diff --name-only "$BASE"...HEAD 2>/dev/null | grep -E '\.php$' || true)
-[[ -n "$php" ]] && block "arquivo PHP no diff — PHP é proibido, migrar (§3.2): $php"
+[[ -n "$php" ]] && block "arquivo PHP no diff — PHP migra por funcionalidade quando tocado (schematize-engineering → references/linguagens.md §2): $php"
 
 echo
 if (( FAIL )); then

@@ -14,6 +14,9 @@
 
 - **Toda query com input externo é parametrizada** por desenho. Concatenação de string em SQL é **VETADA** (§37). Em C#, EF Core ou Dapper com parâmetros; nunca string interpolation em SQL.
 
+- **Operar/migrar Postgres tem dona:** `schematize-postgres` → `references/locks-e-migrations.md` (migration segura, expand-contract, lock_timeout) e `references/pooling.md` (pool/PgBouncer, dimensionamento). Desenho de schema: `schematize-database`.
+- **Contrato de API tem dona:** `schematize-api` → `references/contrato-rest.md` (OpenAPI 3.1 contract-first, erros), `references/idempotencia.md` (`Idempotency-Key`) e `references/versionamento-deprecacao.md` (`Deprecation`/`Sunset`); aqui só o recorte da linguagem.
+
 **Ferramentas sugeridas:** `dotnet ef` migrations (com `Down`), `golang-migrate`, `node-pg-migrate`, `sqlx-cli`, `flyway`.
 
 ## 19. Jobs e Workers
