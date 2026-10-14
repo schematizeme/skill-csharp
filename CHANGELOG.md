@@ -14,6 +14,8 @@ Saneamento transversal das skills de linguagem (coerência com a base e fatos ve
 - Testes: FluentAssertions >=8 é comercial; padrão passa a Shouldly/asserções nativas, FluentAssertions só por ADR de exceção.
 - Blazor/Razor passa a ser governado por esta skill (herda da `schematize-web` só os pisos agnósticos de front); mapa de `seguranca.md` não promete mais 'frontend'.
 - 'Default pragmático' removido da tabela do rol (ponteiro para a base).
+- **Description** reduzida (~270 chars) para caber no orçamento de listagem (soma das 31 skills ≤ 8500; o Claude Code corta a listagem acima disso).
+- **CI:** actions de terceiros pinadas por SHA completo com comentário `# vX.Y.Z` (mesma major em uso; supply chain), mesmo SHA em todas as skills.
 
 ## [0.4.2] — 2026-09-30
 O piso de orquestração passa a ser **herdado** da base em vez de copiado à mão: uma mudança na engineering não exige mais editar 38 arquivos.

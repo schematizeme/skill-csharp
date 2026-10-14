@@ -3,7 +3,9 @@ name: schematize-csharp
 metadata:
   version: 0.4.2
 description: >-
-  Padrões de engenharia da casa para C#/.NET: ASP.NET Core, EF Core, .NET LTS. Use ao projetar, gerar, revisar ou refatorar backend, API, worker, migration, CI/CD ou deploy em projeto com *.csproj/*.sln/*.cs, ou ao escolher C# no rol (fit + ADR). Mantém os pisos de segurança, IAM e archive da base. Blazor é governado aqui.
+  Padrões de engenharia para C#/.NET: ASP.NET Core, EF Core, .NET LTS. Use ao projetar, revisar ou refatorar backend,
+  API, worker, migration ou CI/CD em projeto com *.csproj/*.sln/*.cs, ou ao escolher C# no rol (fit + ADR). Blazor é
+  governado aqui.
 ---
 
 # Padrões de Engenharia da Casa — C# / .NET
