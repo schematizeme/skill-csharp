@@ -25,7 +25,7 @@ antes de produzir código ou decisão — não trabalhe de memória.
 3. **Auth e autorização server-side.** `tenant_id`/role/`user_id` vêm do token
    verificado (claims), nunca do cliente. JWT validado por inteiro via `JwtBearer` +
    `TokenValidationParameters` (assinatura, exp, nbf, aud, iss, alg em allowlist;
-   RS256/EdDSA, nunca HS256 público). Senha em **argon2id** (ou PBKDF2 forte).
+   RS256/EdDSA, nunca HS256 público). Senha em **argon2id-only** (PBKDF2 só legado a migrar; `schematize-engineering → references/iam.md` §2.1).
    Token/sessão por **`RandomNumberGenerator`**, nunca `System.Random`/`Guid`.
 4. **Nullable reference types habilitado** (`<Nullable>enable</Nullable>`); sem
    `#nullable disable` nem `!` (null-forgiving) indiscriminado pra calar o compilador.
@@ -64,7 +64,7 @@ Lista completa com veto + caminho certo: ver `references/anti-padroes.md` (§37)
 
 ## Verde de verdade (testes)
 
-Ferramental: **xUnit + FluentAssertions + coverlet + FsCheck + Stryker.NET + Testcontainers + Moq/NSubstitute**.
+Ferramental: **xUnit + Shouldly (FluentAssertions ≥ 8 é comercial: só com ADR) + coverlet + FsCheck + Stryker.NET + Testcontainers + Moq/NSubstitute**.
 
 - Smoke assere **conteúdo** (shape do body), não só status 200; inclui assertion
   negativa e um **self-check que força falha conhecida** (smoke que nunca falha

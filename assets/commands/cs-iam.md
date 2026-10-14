@@ -35,8 +35,7 @@ Confirme/scaffolde que o auth é **aplicação SEPARADA** (`references/iam.md` �
   **email OTP (Resend) always-on inclusive HML** (só operador desliga); **Twilio** p/
   telefone; providers **plugáveis como interfaces C# via DI** (`IEmailProvider`/`ISmsProvider`/
   `IPushProvider`, adaptadores na borda, registrados no container).
-- **Senha por padrão** (**argon2id**, ex. `Isopoh.Cryptography.Argon2` — ou PBKDF2 do
-  `Microsoft.AspNetCore.Cryptography.KeyDerivation` como fallback — + HIBP), **opcional no seletor**.
+- **Senha por padrão** (**argon2id**, ex. `Isopoh.Cryptography.Argon2` — PBKDF2 só como legado a migrar no próximo login — + HIBP), **opcional no seletor**.
 - **Senha + Email OTP JÁ é o 2FA baseline** (acesso pleno desde o cadastro). Fator forte (passkey/TOTP) é **nudge + step-up just-in-time** (op sensível / risco), **NUNCA muro pré-login** — barrar o acesso por falta de fator forte é o círculo infinito / bug de bootstrap **VETADO** pela norma (`iam.md` §3/§4).
   middleware/policy barra o token de bootstrap fora do enrolamento).
 - Invariante de troca: **mutar fator X exige fator Y≠X no maior AAL**; notificar canais;

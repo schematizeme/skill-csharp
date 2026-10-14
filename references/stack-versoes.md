@@ -1,9 +1,13 @@
 # Stack e Versões — C# / .NET
 
-> **Verificado em: 2026-08-21** — o LTS corrente é o **.NET 10** (último patch **10.0.11**,
-> 11/08/2026), com suporte até nov/2028. **.NET 8 e .NET 9 terminam em 10/11/2026** — menos de
-> três meses a partir desta verificação. *(Este anexo dizia ".NET LTS atual — 8 ou 9"; além de
-> vencido, era factualmente errado: o **9 é STS**, não LTS.)*
+> **Verificado em: 2026-10-14** — o LTS corrente é o **.NET 10** (suporte até nov/2028).
+> **.NET 8 (LTS) e .NET 9 (STS) terminam em 10/11/2026** (anúncio oficial da Microsoft de
+> 29/06/2026) — faltam **menos de quatro semanas** na data desta verificação.
+>
+> **BLOQUEIO:** projeto em .NET 8 ou 9 **precisa migrar para o .NET 10 LTS antes de 10/11/2026**.
+> Depois da data não há correção de segurança: a pendência deixa de ser dívida e vira vulnerabilidade
+> aceita sem ADR — trava o merge/release (piso de supply chain) até a migração ou um ADR de exceção
+> com prazo curto. *(O 9 é STS, não LTS.)*
 >
 > Parte da skill **schematize-csharp**. Define o ferramental, as versões-alvo e o
 > piso de toolchain do recorte C# (.NET) do rol sancionado. A escolha da linguagem
@@ -98,5 +102,5 @@ estar habilitadas na mesma máquina ao mesmo tempo, sem conflito: cada skill ins
 no seu diretório (`.claude/skills/schematize-<slug>/`) e seus comandos são
 prefixados pelo slug (`/cs-*`, `/go-*`, `/rust-*`, `/web-*`). Escolha a skill pela
 natureza do trabalho — C#/.NET aqui, e a linguagem certa por **fit** (§3). O
-frontend (incluindo Blazor/UI) fica no `schematize-web`; a segurança ofensiva na
+frontend Next/Astro fica no `schematize-web` (Blazor é governado aqui, herdando os pisos agnósticos de front dele); a segurança ofensiva na
 `schematize-pentest`.

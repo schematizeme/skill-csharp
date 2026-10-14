@@ -1,4 +1,4 @@
-# Segurança, Auth, Multi-tenancy, LGPD e Frontend
+# Segurança, Auth, Multi-tenancy, LGPD e Segredos no Cliente
 
 
 > **PONTEIRO, não cópia.** A normativa deste tema é da base: **`schematize-engineering`** →
@@ -37,7 +37,7 @@
 
 ### 13.4 Segredos no Cliente / Frontend / NextJS
 
-> O backend .NET **expõe API** e não serve UI própria: o frontend delega ao **schematize-web** (Next/Astro). As regras abaixo valem para qualquer cliente que consome essa API.
+> O backend .NET **expõe API** e não serve UI própria, salvo Blazor/Razor (governado por esta skill, herdando de `schematize-web` só os pisos agnósticos de front); Next/Astro delegam ao **schematize-web**. As regras abaixo valem para qualquer cliente que consome essa API.
 
 - Guardar token de sessão em `localStorage`/`sessionStorage`. Sessão vai em **cookie `HttpOnly` + `Secure` + `SameSite`** (§38, a `schematize-qa` (`references/categorias.md` §§5 e 10) hardening).
 
@@ -109,7 +109,7 @@ app.UseRateLimiter();
 
 ## 38. Frontend / NextJS / SPA — Regras Específicas
 
-> O backend .NET **expõe API**; a UI é responsabilidade do **schematize-web** (Next/Astro, TypeScript strict). As regras de fronteira client/server abaixo governam esse frontend e o contrato que a API .NET oferece a ele.
+> O backend .NET **expõe API**; a UI Next/Astro é do **schematize-web** (TypeScript strict) e Blazor é desta skill. As regras de fronteira client/server abaixo governam esse frontend e o contrato que a API .NET oferece a ele.
 
 - CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` e `frame-ancestors` configurados (hardening; ver a `schematize-qa`, `references/categorias.md` §§5 e 10).
 

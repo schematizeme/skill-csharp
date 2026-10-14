@@ -38,7 +38,7 @@ dotnet test --filter "Category!=Integration"
   trocando o provider por sink no `ConfigureTestServices`.
 - **EF Core: `InMemory` NÃO é banco.** Ele aceita SQL que o Postgres recusa e ignora constraint.
   Teste de repositório usa **Testcontainers** com o banco real; `InMemory` só para lógica pura.
-- **`FluentAssertions`** para asserção legível; **`Verify`** para snapshot.
+- **`Shouldly`** (ou asserções nativas do xUnit / TUnit) para asserção legível; **`Verify`** para snapshot. **FluentAssertions ≥ 8 é comercial (exige licença)**: só entra com ADR de exceção; não use em projeto novo.
 - **Property-based:** `FsCheck`. **Mutation:** Stryker.NET.
 
 ## Onde divergir da base, a base manda

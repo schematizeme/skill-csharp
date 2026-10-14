@@ -9,7 +9,7 @@ aprovação antes de rodar**, executa faseado/assistido ou de uma vez com watchd
 `summary.json` e trava nos gates).
 
 No recorte **C#/.NET**, use as ferramentas de teste da plataforma — `dotnet test` (xUnit), `[Fact]`/`[Theory]`,
-`FluentAssertions`, `WebApplicationFactory`/`TestServer` para integração, `Testcontainers`, `bogus`,
+`Shouldly` (FluentAssertions ≥ 8 é comercial: só com ADR), `WebApplicationFactory`/`TestServer` para integração, `Testcontainers`, `bogus`,
 cobertura (`coverlet`), os scripts de teste da skill (`scripts/`) e o pentest da schematize-pentest.
 
 Rode `/qa-plan` para planejar e aprovar, depois `/qa-run` para executar. Nada de Q.A. roda sem

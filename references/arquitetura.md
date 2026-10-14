@@ -25,8 +25,8 @@ A casa **não tem "a linguagem única"** — tem um **rol sancionado** e um **gu
 
 | Linguagem | Skill irmã | Sufixo de repo | Encaixe (fit) |
 |---|---|---|---|
-| **Go** | `schematize-go` | `_go` | serviços de rede/API concorrentes, CLIs, tooling de infra. **Default pragmático.** |
-| **Rust** | `schematize-rust` | `_rs` | correção/segurança de memória crítica, performance sem GC, componentes sensíveis. **Default quando errar é caro.** |
+| **Go** | `schematize-go` | `_go` | serviços de rede/API concorrentes, CLIs, tooling de infra. |
+| **Rust** | `schematize-rust` | `_rs` | correção/segurança de memória crítica, performance sem GC, componentes sensíveis. |
 | **Elixir** | `schematize-elixir` | `_ex` | realtime/alta concorrência tolerante a falha (BEAM/OTP), messaging/pub-sub. |
 | **C# (.NET)** | **`schematize-csharp`** | **`_cs`** | **ecossistema .NET/enterprise, integração Microsoft, times .NET, cargas ASP.NET Core/EF Core, desktop/Windows quando aplicável.** |
 | **Zig** | `schematize-zig` | `_zig` | baixo nível, performance máxima, interop com C, artefatos pequenos. |
@@ -34,7 +34,7 @@ A casa **não tem "a linguagem única"** — tem um **rol sancionado** e um **gu
 
 **Quando C# é a escolha certa (o fit vira ADR):** a organização/time já é **.NET**; há **integração forte com o ecossistema Microsoft** (Azure, AD/Entra, SQL Server, Office/Graph); a carga é típica de **ASP.NET Core** (APIs, workers, gRPC) com **EF Core**; existe base/domínio **desktop ou Windows** a servir; ou o SDK maduro do fornecedor é primariamente .NET. Em empate técnico com Go, registre o porquê no ADR (o default pragmático da casa é Go).
 
-**Frontend — Node é 100% permitido (e só frontend).** **Next.js** é a stack principal; **Astro e outros frameworks consolidados** são permitidos. O server-side do próprio front (route handlers, server actions, BFF) faz parte do frontend e é governado pelo §13.4 e §38 (segredo só server-side). Blazor/MAUI e qualquer UI ficam com o **`schematize-web`**; **aqui é API/backend/serviços** em C#. Isso vale só para frontend — **não** reabre Node como serviço backend.
+**Frontend — Node é 100% permitido (e só frontend).** **Next.js** é a stack principal; **Astro e outros frameworks consolidados** são permitidos. O server-side do próprio front (route handlers, server actions, BFF) faz parte do frontend e é governado pelo §13.4 e §38 (segredo só server-side). **UI server-rendered em C# (Blazor/Razor) é governada AQUI, por esta skill** (componentes, estado, auth/antiforgery, deploy), herdando da `schematize-web` apenas os pisos agnósticos de front: a11y WCAG 2.2 AA, Core Web Vitals, segurança de front (CSP, sem HTML não sanitizado, segredo só server-side) e SEO. Next/Astro continuam da `schematize-web`. MAUI/desktop: ver `schematize-desktop`. Isso vale só para frontend — **não** reabre Node como serviço backend.
 
 - Versão exata em uso fica no Anexo A / `references/stack-versoes.md` (alvo: **.NET LTS atual — .NET 10**; verificado em 2026-08-21).
 

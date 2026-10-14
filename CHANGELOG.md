@@ -3,6 +3,18 @@
 Todas as mudanças relevantes deste pacote, no formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 com versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.5.0] — 2026-10-14
+Saneamento transversal das skills de linguagem (coerência com a base e fatos verificados).
+
+### Corrigido
+- `description` reescrita (<=350, ancorada em *.csproj/.NET) em bloco `>-`.
+- Hash de senha: argon2id-only para senha nova; bcrypt/PBKDF2 só legado a migrar no próximo login, com ponteiro para `schematize-engineering → references/iam.md` (a skill aceitava alternativa fraca em SKILL.md/CLAUDE.md/anti-padrões).
+- CI: `trivy-action@master` pinado por SHA (v0.36.0), pois ref móvel em gate de segurança é supply chain aberta.
+- `stack-versoes.md`: fim de suporte do .NET 8/9 (10/11/2026, confirmado no anúncio da Microsoft) virou BLOQUEIO de migração para o .NET 10 LTS; faltam menos de quatro semanas.
+- Testes: FluentAssertions >=8 é comercial; padrão passa a Shouldly/asserções nativas, FluentAssertions só por ADR de exceção.
+- Blazor/Razor passa a ser governado por esta skill (herda da `schematize-web` só os pisos agnósticos de front); mapa de `seguranca.md` não promete mais 'frontend'.
+- 'Default pragmático' removido da tabela do rol (ponteiro para a base).
+
 ## [0.4.2] — 2026-09-30
 O piso de orquestração passa a ser **herdado** da base em vez de copiado à mão: uma mudança na engineering não exige mais editar 38 arquivos.
 

@@ -73,7 +73,7 @@ Digite `/cs-help` dentro do Claude Code para ver a lista completa.
 - [skill-engineering](https://github.com/schematizeme/skill-engineering) — base agnóstica de engenharia.
 - [skill-go](https://github.com/schematizeme/skill-go) — backend Go.
 - [skill-rust](https://github.com/schematizeme/skill-rust) — backend Rust.
-- [skill-web](https://github.com/schematizeme/skill-web) — frontend / SEO / performance (Blazor/UI incluídos).
+- [skill-web](https://github.com/schematizeme/skill-web) — frontend Next/Astro / SEO / performance (Blazor é governado pela própria skill C#; herda os pisos agnósticos de front).
 - [skill-pentest](https://github.com/schematizeme/skill-pentest) — teste de segurança.
 
 Podem ficar habilitadas ao mesmo tempo: os comandos são namespaced por skill
