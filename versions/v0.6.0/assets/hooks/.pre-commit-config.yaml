@@ -1,0 +1,27 @@
+# schematize-csharp — pre-commit (pip install pre-commit && pre-commit install).
+# Copie para .pre-commit-config.yaml na raiz do repo.
+repos:
+  - repo: local
+    hooks:
+      - id: archive-secret-scan
+        name: scan de segredo/PII no archive (§16.1/§32)
+        entry: bash .claude/skills/schematize-csharp/scripts/archive-secret-scan.sh .
+        language: system
+        pass_filenames: false
+      - id: standards-gate
+        name: gate de padrões no diff (§35/§37)
+        entry: bash .claude/skills/schematize-csharp/scripts/check-diff.sh HEAD
+        language: system
+        pass_filenames: false
+      - id: dotnet-format
+        name: dotnet format (analyzers/estilo — §6)
+        entry: dotnet format --verify-no-changes --severity warn
+        language: system
+        pass_filenames: false
+        types: [c#]
+      - id: dotnet-build-warnaserror
+        name: build com warnings como erro (nullable/analyzers — §4/§6)
+        entry: dotnet build -c Release -warnaserror --nologo
+        language: system
+        pass_filenames: false
+        types: [c#]

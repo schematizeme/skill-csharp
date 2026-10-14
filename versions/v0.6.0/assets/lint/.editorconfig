@@ -1,0 +1,47 @@
+# schematize-csharp — .editorconfig com analyzers Roslyn (§4, §4.X, §6).
+# Copie para a raiz do repo/solution. Casa com Directory.Build.props (nullable +
+# TreatWarningsAsErrors + EnableNETAnalyzers). Junto, ISTO TRAVA O CI:
+#   dotnet build -warnaserror  &&  dotnet format --verify-no-changes
+# Warning de analyzer/nullable vira ERRO — não há "warning tolerado" (§37).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_size = 4
+# --- Nullable reference types: piso (§4). Não silenciar. ---
+dotnet_diagnostic.CS8600.severity = error   # conversão de null p/ não-nullable
+dotnet_diagnostic.CS8602.severity = error   # deref de possível null
+dotnet_diagnostic.CS8603.severity = error   # retorno possível null
+dotnet_diagnostic.CS8618.severity = error   # non-nullable não inicializado
+dotnet_diagnostic.CS8625.severity = error   # null literal p/ non-nullable
+
+# --- Segurança / correção (§13, §37) ---
+dotnet_diagnostic.CA2100.severity = error   # SQL por concatenação (use parâmetros)
+dotnet_diagnostic.CA5350.severity = error   # cripto fraca (SHA1/DES)
+dotnet_diagnostic.CA5351.severity = error   # cripto quebrada (MD5)
+dotnet_diagnostic.CA5359.severity = error   # não desabilitar validação de cert
+dotnet_diagnostic.CA5394.severity = error   # System.Random inseguro (use RandomNumberGenerator)
+dotnet_diagnostic.CA2007.severity = suggestion # ConfigureAwait — avaliar por projeto
+dotnet_diagnostic.CA2016.severity = error   # propagar CancellationToken (§async)
+
+# --- async correto (§async) ---
+dotnet_diagnostic.CS4014.severity = error   # chamada async sem await
+dotnet_diagnostic.VSTHRD100.severity = error # async void (se usar threading analyzers)
+dotnet_diagnostic.VSTHRD002.severity = error # .Result/.Wait() sync-over-async
+
+# --- estilo (mantém o diff limpo; dotnet format afere) ---
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_style_require_accessibility_modifiers = always:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+# Membro público sem doc XML `///` (alimenta o índice §39) — o gate /cs-review reforça.
+dotnet_diagnostic.CS1591.severity = warning  # ligue GenerateDocumentationFile p/ ativar
